@@ -2,6 +2,7 @@ class HomeController < ApplicationController
   caches_page   :project_css
   
   def index
+    debugger
     
   end
   

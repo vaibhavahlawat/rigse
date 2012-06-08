@@ -1,6 +1,11 @@
 require 'digest/sha1'
 
 class User < ActiveRecord::Base
+  devise :database_authenticatable, :registerable,
+       :recoverable, :rememberable, :validatable, 
+       :encryptable, :encryptor => :restful_authentication_sha1
+  
+  attr_accessible :email, :password, :password_confirmation
   NO_EMAIL_STRING='no-email-'
   has_many :investigations
   has_many :resource_pages
@@ -19,7 +24,7 @@ class User < ActiveRecord::Base
   has_many :mw_modeler_pages, :class_name => 'Embeddable::MwModelerPage'
   has_many :n_logo_models, :class_name => 'Embeddable::NLogoModel'
 
-  scope :active, { :conditions => { :state => 'active' } }
+  #scope :active, { :conditions => { :state => 'active' } }
   scope :no_email, { :conditions => "email LIKE '#{NO_EMAIL_STRING}%'" }
   scope :email, { :conditions => "email NOT LIKE '#{NO_EMAIL_STRING}%'" }
   scope :default, { :conditions => { :default_user => true } }
@@ -39,14 +44,14 @@ class User < ActiveRecord::Base
 
   include Changeable
 
-  include Authentication
-  include Authentication::ByPassword
-  include Authentication::ByCookieToken
-  include Authorization::AasmRoles
+  #include Authentication
+  #include Authentication::ByPassword
+  #include Authentication::ByCookieToken
+  #include Authorization::AasmRoles
 
   attr_accessor :skip_notifications
 
-  before_validation :strip_spaces
+ # before_validation :strip_spaces
 
   # strip leading and trailing spaces from names, login and email
   def strip_spaces
@@ -61,24 +66,24 @@ class User < ActiveRecord::Base
 
   # Validations
 
-  validates_presence_of     :login
-  validates_length_of       :login,    :within => 1..40
-  validates_uniqueness_of   :login
-  validates_format_of       :login,    :with => Authentication.login_regex, :message => Authentication.bad_login_message
+  # validates_presence_of     :login
+  # validates_length_of       :login,    :within => 1..40
+  # validates_uniqueness_of   :login
+  # validates_format_of       :login,    :with => Authentication.login_regex, :message => Authentication.bad_login_message
 
-  validates_format_of       :first_name,     :with => Authentication.name_regex,  :message => Authentication.bad_name_message, :allow_nil => true
-  validates_length_of       :first_name,     :maximum => 100
+  # validates_format_of       :first_name,     :with => Authentication.name_regex,  :message => Authentication.bad_name_message, :allow_nil => true
+  # validates_length_of       :first_name,     :maximum => 100
 
-  validates_format_of       :last_name,     :with => Authentication.name_regex,  :message => Authentication.bad_name_message, :allow_nil => true
-  validates_length_of       :last_name,     :maximum => 100
+  # validates_format_of       :last_name,     :with => Authentication.name_regex,  :message => Authentication.bad_name_message, :allow_nil => true
+  # validates_length_of       :last_name,     :maximum => 100
 
-  validates_presence_of     :email
-  validates_length_of       :email,    :within => 6..100 #r@a.wk
-  validates_uniqueness_of   :email
-  validates_format_of       :email,    :with => Authentication.email_regex, :message => Authentication.bad_email_message
+  # validates_presence_of     :email
+  # validates_length_of       :email,    :within => 6..100 #r@a.wk
+  # validates_uniqueness_of   :email
+  # validates_format_of       :email,    :with => Authentication.email_regex, :message => Authentication.bad_email_message
 
-  validates_presence_of     :vendor_interface_id
-  validates_presence_of     :password, :on => :update, :if => :updating_password?
+  # validates_presence_of     :vendor_interface_id
+  # validates_presence_of     :password, :on => :update, :if => :updating_password?
 
   # Relationships
   has_and_belongs_to_many :roles, :uniq => true, :join_table => "roles_users"
@@ -88,7 +93,7 @@ class User < ActiveRecord::Base
 
   belongs_to :vendor_interface, :class_name => 'Probe::VendorInterface'
 
-  attr_accessor :updating_password
+  #attr_accessor :updating_password
 
   acts_as_replicatable
 

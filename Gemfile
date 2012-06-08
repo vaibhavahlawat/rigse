@@ -19,7 +19,8 @@ source "http://rubygems.org"
   platforms :mingw do
     gem "win32-open3"
   end
-
+  gem 'devise'
+  gem 'devise-encryptable'
   gem "rails",                "~> 3.2"
   gem "arrayfields"
   gem "httpclient",           "~> 2.2"

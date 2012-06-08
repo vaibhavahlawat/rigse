@@ -34,7 +34,11 @@
     - if @container_type
       = javascript_tag "var container_type = '#{@container_type}';"
     = calendar_date_select_includes "silver"
+  
+
   %body
+    
+
 
     #note{:style=>"display: none;"}
     -#= yield :dynamic_js_contents
