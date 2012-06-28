@@ -3,7 +3,16 @@ require 'haml'
 require 'will_paginate/array'
 
 class ApplicationController < ActionController::Base
+  layout :layout_by_resource
   include Clipboard
+
+
+
+  def layout_by_resource
+    if devise_controller?
+      nil
+    end
+  end
 
   # protect_from_forgery
   self.allow_forgery_protection = false

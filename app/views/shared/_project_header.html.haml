@@ -1,18 +1,11 @@
 #userlinks
   %p
     Welcome
-    = "#{current_user.name}."
-  %ul
-    - unless current_user.anonymous?
-      %li= link_to 'Preferences', preferences_user_path(current_user)
-      %li.last= link_to 'Logout', logout_path
-    - else
-      %li= link_to 'Login', login_path
-      %li= link_to 'Sign Up', pick_signup_path
-    - if @original_user.has_role?('admin', 'manager')
-      %li.last= link_to 'Switch', switch_user_path(current_user)
+    = "#{"current_user ? current_user.name : 'Guest'"}."
+  
+    
 
-      = render :partial => 'shared/activity_trail'
+    = render :partial => 'shared/activity_trail'
 
 #lead.project-header
   %h1{:class => theme_name}

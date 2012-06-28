@@ -61,6 +61,11 @@ GEM
     arel (3.0.2)
     arrayfields (4.7.4)
     awesome_print (1.0.2)
+    aws-s3 (0.6.3)
+      builder
+      mime-types
+      xml-simple
+    bcrypt-ruby (3.0.1)
     builder (3.0.0)
     capistrano (2.12.0)
       highline
@@ -110,6 +115,13 @@ GEM
       delayed_job (~> 3.0.0)
     delorean (1.2.0)
       chronic
+    devise (2.1.2)
+      bcrypt-ruby (~> 3.0)
+      orm_adapter (~> 0.1)
+      railties (~> 3.1)
+      warden (~> 1.2.1)
+    devise-encryptable (0.1.1)
+      devise (>= 2.1.0.rc)
     diff-lcs (1.1.3)
     dynamic_form (1.1.4)
     email_spec (1.2.1)
@@ -171,6 +183,7 @@ GEM
     nokogiri (1.5.0)
     nokogiri (1.5.0-x86-mingw32)
     open4 (1.3.0)
+    orm_adapter (0.3.0)
     paperclip (2.4.5)
       activerecord (>= 2.3.0)
       activesupport (>= 2.3.2)
@@ -298,11 +311,14 @@ GEM
     ttfunk (1.0.3)
     tzinfo (0.3.33)
     uuidtools (2.1.2)
+    warden (1.2.1)
+      rack (>= 1.0)
     what_methods (1.0.1)
     will_paginate (3.0.3)
     win32-open3 (0.3.2-x86-mingw32)
     win32console (1.3.1-x86-mingw32)
     wirble (0.1.3)
+    xml-simple (1.1.1)
     xpath (0.1.4)
       nokogiri (~> 1.3)
 
@@ -318,6 +334,7 @@ DEPENDENCIES
   acts-as-taggable-on (~> 2.1.1)
   arrayfields
   awesome_print
+  aws-s3
   calendar_date_select!
   capistrano-ext
   capybara (~> 1.1.2)
@@ -331,6 +348,8 @@ DEPENDENCIES
   delayed_job (~> 3.0.1)
   delayed_job_active_record (~> 0.3.2)
   delorean (~> 1.1)
+  devise
+  devise-encryptable
   dynamic_form (~> 1.1.4)
   email_spec (~> 1.2.1)
   exception_notification (~> 2.5.2)

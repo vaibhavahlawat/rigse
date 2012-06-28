@@ -20,6 +20,8 @@ source "http://rubygems.org"
     gem "win32-open3"
   end
 
+  gem 'devise'
+  gem 'devise-encryptable'
   gem "rails",                "~> 3.2"
   gem "arrayfields"
   gem "httpclient",           "~> 2.2"
@@ -72,7 +74,7 @@ source "http://rubygems.org"
   gem 'daemons',              "~> 1.1.8"
   gem 'rush',                 "~> 0.6.7"
   # to support hosting paperclip attachments on S3:
-  # gem "aws-s3",               :require => "aws/s3"
+  gem "aws-s3",               :require => "aws/s3"
 
 group :development do
   gem "rake",                 "~> 0.9.2"
