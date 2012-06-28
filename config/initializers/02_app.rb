@@ -43,7 +43,7 @@ else
     # do the right thing or not
     ActiveRecord::Base.connection
     puts "running Admin::Project.create_or_update_default_project_from_settings_yml"
-    Admin::Project.create_or_update_default_project_from_settings_yml
+    # Admin::Project.create_or_update_default_project_from_settings_yml
   rescue RuntimeError, StandardError => e
     puts e.message
     puts e.backtrace
