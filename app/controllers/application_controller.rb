@@ -41,7 +41,7 @@ class ApplicationController < ActionController::Base
   before_filter :setup_container
 
   #include AuthenticatedSystem
-  #include RoleRequirementSystem
+  include RoleRequirementSystem
 
   helper :all # include all helpers, all the time
 

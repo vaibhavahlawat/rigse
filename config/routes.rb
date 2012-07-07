@@ -191,7 +191,7 @@ constraints :id => /\d+/ do
     end
 
   end
-  match '/portal/school_selector/update' => 'portal/school_selector#update', :as => :school_selector_update
+  # match '/portal/school_selector/update' => 'portal/school_selector#update', :as => :school_selector_update
   # match '/logout' => 'sessions#destroy', :as => :logout
   # match '/login' => 'sessions#new', :as => :login
   # match '/register' => 'users#create', :as => :register
@@ -222,7 +222,7 @@ constraints :id => /\d+/ do
 
   match '/users/reports/account_report' => 'users#account_report', :as => :users_account_report, :method => :get
   resources :passwords
-  resource :session
+  # resource :session
 
   resources :external_user_domains do
     resources :external_users

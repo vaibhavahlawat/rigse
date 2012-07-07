@@ -3,7 +3,7 @@
 #
 # See RoleSecurityClassMethods for some methods it provides.
 module RoleRequirementSystem
-  def self.included(klass)
+   def self.included(klass)
     # previous this was setup as an inheritable array, but that would mean that the array would be partially
     # shared down the class hierarchy, I'm guessing that role_requirements shouldn't be shared like that
     # so instead this is adding an accessor to the singleton of the klass, which nicely works out to keep
@@ -108,19 +108,19 @@ module RoleRequirementSystem
   end
   
   module RoleSecurityInstanceMethods
-    def self.included(klass)
-      raise "Because role_requirement extends acts_as_authenticated, You must include AuthenticatedSystem first before including RoleRequirementSystem!" unless klass.included_modules.include?(AuthenticatedSystem)
-    end
+    # def self.included(klass)
+    #   raise "Because role_requirement extends acts_as_authenticated, You must include AuthenticatedSystem first before including RoleRequirementSystem!" unless klass.included_modules.include?(AuthenticatedSystem)
+    # end
     
     def access_denied
-      if logged_in?
+      if user_signed_in?
         render :nothing => true, :status => 401
         return false
       else
         super
       end
     end
-    
+    # throw(:warden)
     def check_roles       
       return access_denied unless self.class.user_authorized_for?(current_user, params, binding)
       
