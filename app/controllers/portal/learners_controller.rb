@@ -13,9 +13,9 @@ class Portal::LearnersController < ApplicationController
   end
   
   def learner_teacher_admin
-    redirect_home unless (Portal::Learner.find(params[:id]).student.user == current_user) || 
-      current_clazz.is_teacher?(current_user) ||
-      current_user.has_role?('admin')
+    redirect_home unless (Portal::Learner.find(params[:id]).student.user == current_user_or_guest) || 
+      current_clazz.is_teacher?(current_user_or_guest) ||
+      current_user_or_guest.has_role?('admin')
   end
   
   public
@@ -90,7 +90,7 @@ class Portal::LearnersController < ApplicationController
         # if this isn't the learner then it is launched read only
         properties = {}
         bundle_get_url = dataservice_bundle_logger_url(@portal_learner.bundle_logger, :format => :bundle)
-        if @portal_learner.student.user == current_user
+        if @portal_learner.student.user == current_user_or_guest
           if @portal_learner.bundle_logger.in_progress_bundle
             launch_event = Dataservice::LaunchProcessEvent.create(
               :event_type => Dataservice::LaunchProcessEvent::TYPES[:config_requested],

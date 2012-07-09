@@ -96,7 +96,7 @@ class PasswordsController < ApplicationController
       flash[:notice] = "Password for #{@user.login} was successfully updated."
       @user.require_password_reset=false
       @user.save
-      if @user.id == current_user.id
+      if @user.id == current_user_or_guest.id
         # force the user to login again
         logout_keeping_session!
         redirect_to login_path
@@ -123,7 +123,7 @@ class PasswordsController < ApplicationController
   protected 
   
   def find_password_user
-    return current_user if params[:reset_code] == "0" && !current_user.anonymous?
+    return current_user_or_guest if params[:reset_code] == "0" && !current_user_or_guest.anonymous?
     begin
       @user = Password.find(:first, :conditions => ['reset_code = ? and expiration_date > ?', params[:reset_code], Time.now]).user
       return @user

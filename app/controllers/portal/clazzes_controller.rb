@@ -31,7 +31,7 @@ class Portal::ClazzesController < ApplicationController
     @portal_clazz.refresh_saveable_response_objects
     @teacher = @portal_clazz.parent
     if current_project.allow_default_class
-      @offerings = @portal_clazz.offerings_with_default_classes(current_user)
+      @offerings = @portal_clazz.offerings_with_default_classes(current_user_or_guest)
     else
       @offerings = @portal_clazz.active_offerings
     end
@@ -48,9 +48,9 @@ class Portal::ClazzesController < ApplicationController
     @portal_clazz = Portal::Clazz.new
     if params[:teacher_id]
       @portal_clazz.teacher = Portal::Teacher.find(params[:teacher_id])
-    elsif current_user.portal_teacher
-      @portal_clazz.teacher = current_user.portal_teacher
-      @portal_clazz.teacher_id = current_user.portal_teacher.id
+    elsif current_user_or_guest.portal_teacher
+      @portal_clazz.teacher = current_user_or_guest.portal_teacher
+      @portal_clazz.teacher_id = current_user_or_guest.portal_teacher.id
     end
     respond_to do |format|
       format.html # new.html.erb
@@ -85,7 +85,7 @@ class Portal::ClazzesController < ApplicationController
       okToCreate = false
     end
 
-    if current_user.anonymous?
+    if current_user_or_guest.anonymous?
       flash[:error] = "Anonymous can't create classes. Please log in and try again."
       okToCreate = false
     end
@@ -102,11 +102,11 @@ class Portal::ClazzesController < ApplicationController
     end
 
     if okToCreate && !@portal_clazz.teacher
-      if current_user.portal_teacher
-        @portal_clazz.teacher_id = current_user.portal_teacher.id
-        @portal_clazz.teacher = current_user.portal_teacher
+      if current_user_or_guest.portal_teacher
+        @portal_clazz.teacher_id = current_user_or_guest.portal_teacher.id
+        @portal_clazz.teacher = current_user_or_guest.portal_teacher
       else
-        teacher = Portal::Teacher.create(:user => current_user) # Former call set :user_id directly; class validations didn't like that
+        teacher = Portal::Teacher.create(:user => current_user_or_guest) # Former call set :user_id directly; class validations didn't like that
         if teacher && teacher.id # Former call used .id directly on create method, leaving room for NilClass error
           @portal_clazz.teacher_id = teacher.id # Former call tried to do another Portal::Teacher.create. We don't want to double-create this teacher
           @portal_clazz.teacher = teacher
@@ -327,7 +327,7 @@ class Portal::ClazzesController < ApplicationController
     @portal_clazz = Portal::Clazz.find_by_id(params[:id])
 
     (render(:update) { |page| page << "$('flash').update('Class not found')" } and return) unless @portal_clazz
-    (render(:update) { |page| page << "$('flash').update('#{Portal::Clazz::ERROR_UNAUTHORIZED}')" } and return) unless current_user && @portal_clazz.changeable?(current_user)
+    (render(:update) { |page| page << "$('flash').update('#{Portal::Clazz::ERROR_UNAUTHORIZED}')" } and return) unless current_user_or_guest && @portal_clazz.changeable?(current_user_or_guest)
 
     @teacher = Portal::Teacher.find_by_id(params[:teacher_id])
 
@@ -354,7 +354,7 @@ class Portal::ClazzesController < ApplicationController
     @teacher = @portal_clazz.teachers.find_by_id(params[:teacher_id])
     (render(:update) { |page| page << "$('flash').update('Teacher not found')" } and return) unless @teacher
 
-    if (reason = @portal_clazz.reason_user_cannot_remove_teacher_from_class(current_user, @teacher))
+    if (reason = @portal_clazz.reason_user_cannot_remove_teacher_from_class(current_user_or_guest, @teacher))
       render(:update) { |page| page << "$('flash').update('#{reason}')" }
       return
     end
@@ -363,7 +363,7 @@ class Portal::ClazzesController < ApplicationController
       @teacher.remove_clazz(@portal_clazz)
       @portal_clazz.reload
 
-      if @teacher == current_user.portal_teacher
+      if @teacher == current_user_or_guest.portal_teacher
         flash[:notice] = "You have been successfully removed from class: #{@portal_clazz.name}"
         render(:update) { |page| page.redirect_to home_url }
       else

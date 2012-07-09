@@ -28,7 +28,7 @@ class Portal::Clazz < ActiveRecord::Base
   # String constants for error messages -- Cantina-CMH 6/2/10
   ERROR_UNAUTHORIZED = "You are not allowed to modify this class."
   ERROR_REMOVE_TEACHER_LAST_TEACHER = "You cannot remove the last teacher from this class."
-  #ERROR_REMOVE_TEACHER_CURRENT_USER = "You cannot remove yourself from this class."
+  #ERROR_REMOVE_TEACHER_current_user_or_guest = "You cannot remove yourself from this class."
 
   # JavaScript confirm messages -- Cantina-CMH 6/9/10
   def self.WARNING_REMOVE_TEACHER_CURRENT_USER(clazz_name)

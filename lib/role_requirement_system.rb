@@ -122,7 +122,7 @@ module RoleRequirementSystem
     end
     # throw(:warden)
     def check_roles       
-      return access_denied unless self.class.user_authorized_for?(current_user, params, binding)
+      return access_denied unless self.class.user_authorized_for?(current_user_or_guest, params, binding)
       
       true
     end
@@ -140,7 +140,7 @@ module RoleRequirementSystem
       else
         klass = self.class
       end
-      klass.user_authorized_for?(current_user, params, binding)
+      klass.user_authorized_for?(current_user_or_guest, params, binding)
     end
   end
 end

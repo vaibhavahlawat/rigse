@@ -1,7 +1,7 @@
 #userlinks
   %p
     Welcome
-    = "#{"current_user ? current_user.name : 'Guest'"}."
+    = "#{"current_user_or_guest ? current_user_or_guest.name : 'Guest'"}."
   
     
 

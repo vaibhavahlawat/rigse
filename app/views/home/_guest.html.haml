@@ -1,7 +1,7 @@
 - content_for :top_menu_items do
   =link_to(TOP_LEVEL_CONTAINER_NAME_PLURAL, investigations_path)
 
-=render :partial => 'sessions/new'
+-#=render :partial => 'sessions/new'
 .padded_content
   - unless current_project.home_page_content.nil? || current_project.home_page_content.empty?
     = current_project.home_page_content.html_safe unless current_project.home_page_content.nil?

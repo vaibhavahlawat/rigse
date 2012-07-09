@@ -3,7 +3,7 @@
     %ul.quiet_list
       %li
         = run_link_for(offering)
-        - if current_user.has_role?("admin") && @portal_student
+        - if current_user_or_guest.has_role?("admin") && @portal_student
           |
           - learner = @portal_student.learners.find_by_offering_id(offering.id)
           - if learner

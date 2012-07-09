@@ -270,7 +270,7 @@ module OtmlHelper
     # otml can use the current user's device.
     # debugger
     if use_current_user
-      vendor_interface = current_user.vendor_interface
+      vendor_interface = current_user_or_guest.vendor_interface
     else
       vendor_interface = Probe::VendorInterface.find_by_short_name("vernier_goio")
     end
