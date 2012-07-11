@@ -191,19 +191,19 @@ constraints :id => /\d+/ do
     end
 
   end
-  match '/portal/school_selector/update' => 'portal/school_selector#update', :as => :school_selector_update
-  match '/logout' => 'sessions#destroy', :as => :logout
-  match '/login' => 'sessions#new', :as => :login
-  match '/register' => 'users#create', :as => :register
-  match '/signup' => 'users#new', :as => :signup
-  match '/activate/:activation_code' => 'users#activate', :as => :activate, :activation_code => nil
-  match '/forgot_password' => 'passwords#login', :as => :forgot_password
-  match '/forgot_password/email' => 'passwords#email', :as => :forgot_password_email
-  match '/change_password/:reset_code' => 'passwords#reset', :as => :change_password
-  match '/password/:user_id/questions' => 'passwords#questions', :as => :password_questions
-  match '/password/:user_id/check_questions' => 'passwords#check_questions', :as => :check_password_questions
-  match '/opensession' => 'sessions#create', :as => :open_id_complete, :constraints => { :method => 'get' }
-  match '/opencreate' => 'users#create', :as => :open_id_create, :constraints => { :method => 'get' }
+  # match '/portal/school_selector/update' => 'portal/school_selector#update', :as => :school_selector_update
+  # match '/logout' => 'sessions#destroy', :as => :logout
+  # match '/login' => 'sessions#new', :as => :login
+  # match '/register' => 'users#create', :as => :register
+  # match '/signup' => 'users#new', :as => :signup
+  # match '/activate/:activation_code' => 'users#activate', :as => :activate, :activation_code => nil
+  # match '/forgot_password' => 'passwords#login', :as => :forgot_password
+  # match '/forgot_password/email' => 'passwords#email', :as => :forgot_password_email
+  # match '/change_password/:reset_code' => 'passwords#reset', :as => :change_password
+  # match '/password/:user_id/questions' => 'passwords#questions', :as => :password_questions
+  # match '/password/:user_id/check_questions' => 'passwords#check_questions', :as => :check_password_questions
+  # match '/opensession' => 'sessions#create', :as => :open_id_complete, :constraints => { :method => 'get' }
+  # match '/opencreate' => 'users#create', :as => :open_id_create, :constraints => { :method => 'get' }
 
   resources :users do
     member do
@@ -222,11 +222,11 @@ constraints :id => /\d+/ do
 
   match '/users/reports/account_report' => 'users#account_report', :as => :users_account_report, :method => :get
   resources :passwords
-  resource :session
+  # resource :session
 
   resources :external_user_domains do
     resources :external_users
-    resources :external_sessions
+    # resources :external_sessions
   end
 
   namespace :dataservice do
