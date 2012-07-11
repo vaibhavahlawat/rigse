@@ -31,16 +31,16 @@ class ApplicationController < ActionController::Base
 
   before_filter :setup_container
 
-  include AuthenticatedSystem
-  include RoleRequirementSystem
+  # include AuthenticatedSystem
+  # include RoleRequirementSystem
 
   helper :all # include all helpers, all the time
 
-  before_filter :check_user
-  before_filter :original_user
-  before_filter :portal_resources
-  before_filter :check_for_password_reset_requirement
-  before_filter :check_student_security_questions_ok
+  # before_filter :check_user
+  # before_filter :original_user
+  # before_filter :portal_resources
+  # before_filter :check_for_password_reset_requirement
+  # before_filter :check_student_security_questions_ok
 
   # Portal::School.find(:first).members.count
 
