@@ -7,9 +7,12 @@ class ApplicationController < ActionController::Base
 
   #for devise
   helper_method :current_user_or_guest
+  skip_before_filter :verify_authenticity_token, :only => [:name_of_your_action]
   
   # protect_from_forgery
-  self.allow_forgery_protection = false
+  #self.allow_forgery_protection = false
+  protect_from_forgery
+  
   layout :layout_by_resource
 
 
