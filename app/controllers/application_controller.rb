@@ -5,6 +5,9 @@ require 'will_paginate/array'
 class ApplicationController < ActionController::Base
   include Clipboard
 
+  #for devise
+  helper_method :current_user_or_guest
+  
   # protect_from_forgery
   self.allow_forgery_protection = false
   layout :layout_by_resource
@@ -40,7 +43,7 @@ class ApplicationController < ActionController::Base
   before_filter :setup_container
 
   # include AuthenticatedSystem
-  # include RoleRequirementSystem
+ include RoleRequirementSystem
 
   helper :all # include all helpers, all the time
 
@@ -159,4 +162,14 @@ class ApplicationController < ActionController::Base
       end
     end
   end
+
+  # method to login as user or as anonymous
+  def current_user_or_guest
+    if user_signed_in?
+      current_user
+    else
+      @guest_user ||= User.anonymous
+    end
+  end
+
 end
