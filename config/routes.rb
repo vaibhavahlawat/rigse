@@ -1,4 +1,6 @@
 RailsPortal::Application.routes.draw do
+  devise_for :users
+
 constraints :id => /\d+/ do
   namespace :saveable do
     namespace :sparks do
