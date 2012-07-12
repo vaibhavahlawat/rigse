@@ -116,8 +116,8 @@ class ApplicationController < ActionController::Base
 
   # setup the portal_teacher and student instance variables
   def portal_resources
-    @portal_teacher = current_user.portal_teacher
-    @portal_student = current_user.portal_student
+    @portal_teacher = current_user_or_guest.portal_teacher
+    @portal_student = current_user_or_guest.portal_student
   end
 
   # Accesses the user that this session originally logged in as.
@@ -125,16 +125,16 @@ class ApplicationController < ActionController::Base
     if session[:original_user_id]
       @original_user ||=  User.find(session[:original_user_id])
     else
-      @original_user = current_user
+      @original_user = current_user_or_guest
     end
   end
 
 
   def check_user
     if logged_in?
-      self.current_user = current_user
+      self.current_user_or_guest = current_user_or_guest
     else
-      self.current_user = User.anonymous
+      self.current_user_or_guest = User.anonymous
     end
   end
 
@@ -151,7 +151,7 @@ class ApplicationController < ActionController::Base
   end
 
   def check_for_password_reset_requirement
-    if current_user && current_user.require_password_reset
+    if current_user_or_guest && current_user_or_guest.require_password_reset
       unless session_sensitive_path
         redirect_to change_password_path :reset_code => "0"
       end
@@ -159,9 +159,9 @@ class ApplicationController < ActionController::Base
   end
 
   def check_student_security_questions_ok
-    if current_project && current_project.use_student_security_questions && !current_user.portal_student.nil? && current_user.security_questions.size < 3
+    if current_project && current_project.use_student_security_questions && !current_user_or_guest.portal_student.nil? && current_user_or_guest.security_questions.size < 3
       unless session_sensitive_path
-        redirect_to(edit_user_security_questions_path(current_user))
+        redirect_to(edit_user_security_questions_path(current_user_or_guest))
       end
     end
   end
