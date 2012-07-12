@@ -64,7 +64,7 @@ class HomeController < ApplicationController
   end
 
   # def index
-  #   if current_user.require_password_reset
+  #   if current_user_or_guest.require_password_reset
   #     redirect_to :controller => :passwords, :action=>'reset', :reset_code => 0
   #   end
   # end

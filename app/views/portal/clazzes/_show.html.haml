@@ -14,7 +14,7 @@
         %script $("main_flash_message_div").hide();$("setup_flash_message_div").show();
       .action_menu_header_left
       .action_menu_header_right
-        -if portal_clazz.changeable? current_user
+        -if portal_clazz.changeable? current_user_or_guest
           = link_to "edit class information", edit_portal_clazz_url(portal_clazz)
       .block_list
         %ul
