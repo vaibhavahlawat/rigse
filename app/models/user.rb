@@ -21,6 +21,10 @@ class User < ActiveRecord::Base
   
   has_many :resource_pages
 
+  has_one :portal_teacher, :class_name => "Portal::Teacher"
+  has_one :portal_student, :class_name => "Portal::Student"
+
+
 
   def has_role?(*role_list)
     roles.reload # will always hit the database?
