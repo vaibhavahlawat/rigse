@@ -13,7 +13,7 @@ class ApplicationController < ActionController::Base
   #self.allow_forgery_protection = false
   protect_from_forgery
   
-  layout :layout_by_resource
+  #layout :layout_by_resource
 
 
   def layout_by_resource
