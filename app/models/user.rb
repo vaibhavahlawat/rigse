@@ -23,7 +23,9 @@ class User < ActiveRecord::Base
 
   has_one :portal_teacher, :class_name => "Portal::Teacher"
   has_one :portal_student, :class_name => "Portal::Student"
-
+  has_many :investigations
+  
+  scope :default, { :conditions => { :default_user => true } }
 
 
   def has_role?(*role_list)

@@ -5,7 +5,7 @@
   %ul
     - unless current_user_or_guest.anonymous?
       %li= link_to 'Preferences', preferences_user_path(current_user_or_guest)
-      %li.last= link_to 'Logout', sign_out
+      -#%li.last= link_to 'Logout', sign_out
     - else
       -#%li= link_to 'Login', sign_in
       %li= link_to 'Sign Up', pick_signup_path
