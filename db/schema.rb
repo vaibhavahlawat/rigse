@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120621133703) do
+ActiveRecord::Schema.define(:version => 20120718102905) do
 
   create_table "activities", :force => true do |t|
     t.integer  "user_id"
@@ -1665,6 +1665,7 @@ ActiveRecord::Schema.define(:version => 20120621133703) do
     t.datetime "updated_at",                                        :null => false
     t.boolean  "active",                         :default => true
     t.boolean  "default_offering",               :default => false
+    t.integer  "position",                       :default => 0
   end
 
   create_table "portal_school_memberships", :force => true do |t|
@@ -1750,8 +1751,10 @@ ActiveRecord::Schema.define(:version => 20120621133703) do
     t.datetime "end_time"
     t.integer  "clazz_id"
     t.integer  "teacher_id"
-    t.datetime "created_at",                :null => false
-    t.datetime "updated_at",                :null => false
+    t.datetime "created_at",                                  :null => false
+    t.datetime "updated_at",                                  :null => false
+    t.boolean  "active",                    :default => true
+    t.integer  "position",                  :default => 0
   end
 
   add_index "portal_teacher_clazzes", ["clazz_id"], :name => "index_portal_teacher_clazzes_on_clazz_id"
@@ -2172,34 +2175,5 @@ ActiveRecord::Schema.define(:version => 20120621133703) do
     t.datetime "updated_at",                         :null => false
     t.integer  "user_id"
   end
-
-  create_table "users", :force => true do |t|
-    t.string   "login",                     :limit => 40
-    t.string   "first_name",                :limit => 100, :default => ""
-    t.string   "last_name",                 :limit => 100, :default => ""
-    t.string   "email",                     :limit => 100
-    t.string   "crypted_password",          :limit => 40
-    t.string   "salt",                      :limit => 40
-    t.string   "remember_token",            :limit => 40
-    t.string   "activation_code",           :limit => 40
-    t.string   "state",                                    :default => "passive", :null => false
-    t.datetime "remember_token_expires_at"
-    t.datetime "activated_at"
-    t.datetime "deleted_at"
-    t.string   "uuid",                      :limit => 36
-    t.datetime "created_at",                                                      :null => false
-    t.datetime "updated_at",                                                      :null => false
-    t.integer  "vendor_interface_id"
-    t.boolean  "default_user",                             :default => false
-    t.boolean  "site_admin",                               :default => false
-    t.string   "type"
-    t.integer  "external_user_domain_id"
-    t.string   "external_id"
-    t.boolean  "require_password_reset",                   :default => false
-    t.boolean  "of_consenting_age",                        :default => false
-    t.boolean  "have_consent",                             :default => false
-  end
-
-  add_index "users", ["login"], :name => "index_users_on_login", :unique => true
 
 end
