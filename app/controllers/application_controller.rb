@@ -7,6 +7,14 @@ class ApplicationController < ActionController::Base
 
   # protect_from_forgery
   self.allow_forgery_protection = false
+  layout :layout_by_resource
+
+
+  def layout_by_resource
+    if devise_controller?
+      nil
+    end
+  end
 
   theme :get_theme
 
