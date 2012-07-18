@@ -1,12 +1,13 @@
 class Portal::TeachersController < ApplicationController
+  skip_before_filter :authenticate_user!
   include RestrictedPortalController
   before_filter :teacher_admin_or_manager, :except=> [:new, :create]
   public
 
   def teacher_admin_or_manager
-    if current_user.has_role?('admin') ||
-       current_user.has_role?('manager') ||
-       (current_user.portal_teacher && current_user.portal_teacher.id.to_s == params[:id])
+    if current_user_or_guest.has_role?('admin') ||
+       current_user_or_guest.has_role?('manager') ||
+       (current_user_or_guest.portal_teacher && current_user_or_guest.portal_teacher.id.to_s == params[:id])
        # this user is authorized
        true
     else
@@ -76,17 +77,17 @@ class Portal::TeachersController < ApplicationController
     @user = User.new(params[:user])
     @school_selector = Portal::SchoolSelector.new(params)
 
-    if (@user.valid?)
+    # if (@user.valid?)
       # TODO: save backing DB objects
       # @school_selector.save
-    end
+    # end
     @portal_teacher = Portal::Teacher.new do |t|
       t.user = @user
       t.domain = @domain
       t.schools << @school_selector.school if @school_selector.valid?
       t.grades << @portal_grade if !@portal_grade.nil?
     end
-    if @school_selector.valid? && @user.register! && @portal_teacher.save
+    if @school_selector.valid? && @portal_teacher.save
       # will redirect:
       return successful_creation(@user)
     end
@@ -132,9 +133,9 @@ class Portal::TeachersController < ApplicationController
   end
   
   def failed_creation(message = 'Sorry, there was an error creating your account')
-    # force the current_user to anonymous, because we have not successfully created an account yet.
+    # force the current_user_or_guest to anonymous, because we have not successfully created an account yet.
     # edge case, which we might need a more integrated solution for??
-    self.current_user = User.anonymous
+    current_user_or_guest= User.anonymous
     flash.now[:error] = message
     render :action => :new
   end

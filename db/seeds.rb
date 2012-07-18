@@ -13,8 +13,9 @@ teacher_user = User.find_or_create_by_login(:login => 'sparks_teacher',
   :first_name => 'Ms', :last_name => 'Sparkles',
   :email => 'sparks_teacher@concord.org',
   :password => "password", :password_confirmation => "password"){|u| u.skip_notifications = true}
-teacher_user.register! if teacher_user.activated_at.nil?
-teacher_user.activate! if teacher_user.activated_at.nil?
+ teacher_user.register! if teacher_user.activated_at.nil?
+ teacher_user.activate! if teacher_user.activated_at.nil?
+# teacher_user.confirm! if teacher_user.confirmed?
 
 # Give the teacher a role of 'member'
 teacher_user.add_role('member')

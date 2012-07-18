@@ -1,6 +1,6 @@
-- if current_user.has_role?('admin', 'manager','researcher')
+- if current_user_or_guest.has_role?('admin', 'manager','researcher')
   %li.trail= link_to 'Reports', learner_report_path
-- if current_user.has_role?('admin', 'manager')
+- if current_user_or_guest.has_role?('admin', 'manager')
   %li.trail= link_to 'Districts', portal_districts_path
   %li.trail= link_to 'Schools', portal_schools_path
   - if APP_CONFIG[:use_gse]

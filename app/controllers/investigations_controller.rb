@@ -8,7 +8,10 @@ class InvestigationsController < AuthoringController
 
   include RestrictedController
   #access_rule 'researcher', :only => [:usage_report, :details_report]
-
+  
+  #to skip devise
+  skip_before_filter :authenticate_user!
+  
   before_filter :setup_object, :except => [:index,:list_filter,:preview_index]
   before_filter :render_scope, :only => [:show]
   # editing / modifying / deleting require editable-ness
@@ -30,7 +33,7 @@ class InvestigationsController < AuthoringController
   end
 
   def can_create
-    if (current_user.anonymous?)
+    if (current_user_or_guest.anonymous?)
       flash[:error] = "Anonymous users can not create investigaitons"
       redirect_back_or investigations_path
     end
@@ -42,8 +45,8 @@ class InvestigationsController < AuthoringController
 
   def can_edit
     if defined? @investigation
-      unless @investigation.changeable?(current_user)
-        error_message = "you (#{current_user.login}) can not #{action_name.humanize} #{@investigation.name}"
+      unless @investigation.changeable?(current_user_or_guest)
+        error_message = "you (#{current_user_or_guest.login}) can not #{action_name.humanize} #{@investigation.name}"
         flash[:error] = error_message
         if request.xhr?
           render :text => "<div class='flash_error'>#{error_message}</div>"
@@ -110,7 +113,7 @@ class InvestigationsController < AuthoringController
       session[:include_usage_count] = params[:include_usage_count]
     end
 
-    if current_user.anonymous?
+    if current_user_or_guest.anonymous?
       session[:include_usage_count] = false
       @include_drafts = false
     end
@@ -127,7 +130,7 @@ class InvestigationsController < AuthoringController
     @investigations = Investigation.search_list(search_options)
 
     if params[:mine_only]
-      @investigations = @investigations.reject { |i| i.user.id != current_user.id }
+      @investigations = @investigations.reject { |i| i.user.id != current_user_or_guest.id }
     end
 
     @paginated_objects = @investigations
@@ -160,7 +163,7 @@ class InvestigationsController < AuthoringController
     })
 
     if params[:mine_only]
-      @investigations = @investigations.reject { |i| i.user.id != current_user.id }
+      @investigations = @investigations.reject { |i| i.user.id != current_user_or_guest.id }
     end
 
     render :layout => false
@@ -230,7 +233,7 @@ class InvestigationsController < AuthoringController
   # GET /pages/new.xml
   def new
     @investigation = Investigation.new
-    @investigation.user = current_user
+    @investigation.user = current_user_or_guest
     if APP_CONFIG[:use_gse]
       @gse = RiGse::GradeSpanExpectation.default
       @investigation.grade_span_expectation = @gse
@@ -283,7 +286,7 @@ class InvestigationsController < AuthoringController
       logger.error('could not find gse')
     end
     @investigation = Investigation.new(params[:investigation])
-    @investigation.user = current_user
+    @investigation.user = current_user_or_guest
     respond_to do |format|
       if @investigation.save
         flash[:notice] = "#{Investigation.display_name} was successfully created."
@@ -360,7 +363,7 @@ class InvestigationsController < AuthoringController
   # DELETE /pages/1.xml
   def destroy
     @investigation = Investigation.find(params[:id])
-    if @investigation.changeable?(current_user)
+    if @investigation.changeable?(current_user_or_guest)
       if @investigation.offerings && @investigation.offerings.size > 0
         flash[:error] = "This #{Investigation.display_name} can't be destoyed, its in use by classes..."
         @failed = true
@@ -380,7 +383,7 @@ class InvestigationsController < AuthoringController
   ##
   def add_activity
     @activity = Activity.new
-    @activity.user = current_user
+    @activity.user = current_user_or_guest
     @activity.investigation = @investigation
     @activity.save
     redirect_to edit_activity_path @activity
@@ -413,7 +416,7 @@ class InvestigationsController < AuthoringController
   ##
   def duplicate
     @original = Investigation.find(params['id'])
-    @investigation = @original.duplicate(current_user)
+    @investigation = @original.duplicate(current_user_or_guest)
     @investigation.save
     flash[:notice] ="Copied #{@original.name}"
     redirect_to url_for(@investigation)
@@ -440,7 +443,7 @@ class InvestigationsController < AuthoringController
   # see: views/investigations/_paste_link
   #
   def paste
-    if @investigation.changeable?(current_user)
+    if @investigation.changeable?(current_user_or_guest)
       @original = clipboard_object(params)
       if (@original)
         @component = @original.deep_clone :no_duplicates => true, :never_clone => [:uuid, :updated_at,:created_at], :include => {:sections => :pages}
@@ -448,7 +451,7 @@ class InvestigationsController < AuthoringController
           # @component.original = @original
           @container = params[:container] || 'investigation_activities_list'
           @component.name = "copy of #{@component.name}"
-          @component.deep_set_user current_user
+          @component.deep_set_user current_user_or_guest
           @component.investigation = @investigation
           @component.save
         end

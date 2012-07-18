@@ -74,7 +74,7 @@ module SimpleAccessControl
   #     has_permission?('role')
   #     has_permission?('admin', other_user)
   def has_permission?(rule, user = nil)
-    user ||= (send(:current_user) if respond_to?(:current_user)) || nil
+    user ||= (send(:current_user_or_guest) if respond_to?(:current_user_or_guest)) || nil
     access_controller.process(rule, user)
   end
   

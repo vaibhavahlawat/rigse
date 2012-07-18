@@ -47,7 +47,7 @@ class Portal::OfferingsController < ApplicationController
          if learner = setup_portal_student
            cookies[:save_path] = @offering.runnable.save_path
            cookies[:learner_id] = learner.id
-           cookies[:student_name] = "#{current_user.first_name} #{current_user.last_name}"
+           cookies[:student_name] = "#{current_user_or_guest.first_name} #{current_user_or_guest.last_name}"
            cookies[:activity_name] = @offering.runnable.name
            cookies[:class_id] = learner.offering.clazz.id
            cookies[:student_id] = learner.student.id
@@ -73,7 +73,7 @@ class Portal::OfferingsController < ApplicationController
           )
           render :partial => 'shared/learn_or_installer', :locals => { :skip_installer => params.delete(:skip_installer), :runnable => @offering.runnable, :learner => learner }
         else
-          # The current_user is a teacher (or another user acting like a teacher)
+          # The current_user_or_guest is a teacher (or another user acting like a teacher)
           render :partial => 'shared/show_or_installer', :locals => { :skip_installer => params.delete(:skip_installer), :runnable => @offering.runnable, :teacher_mode => true }
         end
       }
@@ -252,7 +252,7 @@ class Portal::OfferingsController < ApplicationController
   def data_test
     clazz = Portal::Clazz::data_test_clazz
     @offering = clazz.offerings.first
-    @user = current_user
+    @user = current_user_or_guest
     @student = @user.portal_student
     unless @student
       @student=Portal::Student.create(:user => @user)
@@ -268,7 +268,7 @@ class Portal::OfferingsController < ApplicationController
 
   def setup_portal_student
     learner = nil
-    if portal_student = current_user.portal_student
+    if portal_student = current_user_or_guest.portal_student
       # create a learner for the user if one doesnt' exist
       learner = @offering.find_or_create_learner(portal_student)
     end

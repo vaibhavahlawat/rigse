@@ -108,9 +108,9 @@ module RoleRequirementSystem
   end
   
   module RoleSecurityInstanceMethods
-    def self.included(klass)
-      raise "Because role_requirement extends acts_as_authenticated, You must include AuthenticatedSystem first before including RoleRequirementSystem!" unless klass.included_modules.include?(AuthenticatedSystem)
-    end
+    # def self.included(klass)
+    #   raise "Because role_requirement extends acts_as_authenticated, You must include AuthenticatedSystem first before including RoleRequirementSystem!" unless klass.included_modules.include?(AuthenticatedSystem)
+    # end
     
     def access_denied
       if logged_in?
@@ -122,7 +122,7 @@ module RoleRequirementSystem
     end
     
     def check_roles       
-      return access_denied unless self.class.user_authorized_for?(current_user, params, binding)
+      return access_denied unless self.class.user_authorized_for?(current_user_or_guest, params, binding)
       
       true
     end
@@ -140,7 +140,7 @@ module RoleRequirementSystem
       else
         klass = self.class
       end
-      klass.user_authorized_for?(current_user, params, binding)
+      klass.user_authorized_for?(current_user_or_guest, params, binding)
     end
   end
 end

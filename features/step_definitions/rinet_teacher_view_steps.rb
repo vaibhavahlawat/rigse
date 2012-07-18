@@ -8,8 +8,9 @@ Given /a rinet teacher/i do
   @user = Factory(:user, {
     :login => @rites_login
   });
-  @user.register
-  @user.activate
+  # @user.register
+  # @user.activate
+  @user.confirm!
   @teacher = Factory(:portal_teacher, {
     :user => @user
   })
@@ -36,8 +37,9 @@ Given /a rinet teacher/i do
     user = Factory(:user, {
       :login => rites_login
     })
-    user.register
-    user.activate
+    # user.register
+    # user.activate
+    user.confirm!
     student = Factory(:portal_student, {
       :user => user
     })
