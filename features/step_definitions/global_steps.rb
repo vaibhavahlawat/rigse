@@ -15,11 +15,14 @@ def login_as(username)
 end
 
 def login_with_ui_as(username, password)
-  visit "/login"
-  within("#project-signin") do
-    fill_in("login", :with => username)
-    fill_in("password", :with => password)
-    click_button("Login")
+  visit "/users/login"
+  # within("#project-signin") do
+    within("#new_user") do
+    # fill_in("login", :with => username)
+    fill_in("user_login", :with => username)
+    # fill_in("password", :with => password)
+    fill_in("user_password", :with => password)
+    click_button("Sign in")
     @cuke_current_username = username
   end
 end
@@ -49,8 +52,8 @@ Given /the following users[(?exist):\s]*$/i do |users_table|
       roles.each do |role|
         user.add_role(role)
       end
-      user.register
-      user.activate
+      user.confirm!
+      # user.activate
       user.save!
     rescue ActiveRecord::RecordInvalid
       # assume this user is already created...

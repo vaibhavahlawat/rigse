@@ -8,7 +8,7 @@ describe "/dataservice/blobs/index.html.haml" do
     view.stub!(:show_menu_for).and_return("show menu")
 
     power_user = stub_model(User, :has_role? => true)
-    view.stub!(:current_user).and_return(power_user)
+    view.stub!(:current_user_or_guest).and_return(power_user)
 
     # the changeable? => true prevents a current_user lookup, but will test if editing links correctly wrap the passed block
     collection = WillPaginate::Collection.create(1,10) do |coll|

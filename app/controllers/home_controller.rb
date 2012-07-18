@@ -1,5 +1,6 @@
 class HomeController < ApplicationController
   caches_page   :project_css
+  skip_before_filter :authenticate_user!
   
   def index
     
@@ -15,6 +16,15 @@ class HomeController < ApplicationController
       @document = FormattedDoc.new(File.join('doc', document_path))
       render :action => "formatted_doc", :layout => "technical_doc"
     end
+  end
+
+  # for cucumber testing only
+  def backdoor
+    #logout_killing_session!
+    sign_out self.current_user_or_guest
+    # self.current_user_or_guest = User.find_by_login!(params[:username])
+    sign_in User.find_by_login!(params[:username]), :bypass=> true
+    head :ok
   end
 
   def pick_signup
@@ -64,7 +74,7 @@ class HomeController < ApplicationController
   end
 
   # def index
-  #   if current_user.require_password_reset
+  #   if current_user_or_guest.require_password_reset
   #     redirect_to :controller => :passwords, :action=>'reset', :reset_code => 0
   #   end
   # end

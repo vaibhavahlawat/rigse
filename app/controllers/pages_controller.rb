@@ -16,7 +16,7 @@ class PagesController < ApplicationController
   end
   
   def can_create
-    if (current_user.anonymous?)
+    if (current_user_or_guest.anonymous?)
       flash[:error] = "Anonymous users can not create pages"
       redirect_back_or pages_path
     end
@@ -46,8 +46,8 @@ class PagesController < ApplicationController
   
   def can_edit
     if defined? @page
-      unless @page.changeable?(current_user)
-        error_message = "you (#{current_user.login}) are not permitted to #{action_name.humanize} (#{@page.name})"
+      unless @page.changeable?(current_user_or_guest)
+        error_message = "you (#{current_user_or_guest.login}) are not permitted to #{action_name.humanize} (#{@page.name})"
         flash[:error] = error_message
         if request.xhr?
           render :text => "<div class='flash_error'>#{error_message}</div>"
@@ -86,7 +86,7 @@ class PagesController < ApplicationController
     })
 
     if params[:mine_only]
-      @pages = @pages.reject { |i| i.user.id != current_user.id }
+      @pages = @pages.reject { |i| i.user.id != current_user_or_guest.id }
     end
 
     @paginated_objects = @pages
@@ -165,7 +165,7 @@ class PagesController < ApplicationController
   # POST /page.xml
   def create
     @page = Page.create(params[:page])
-    @page.user = current_user
+    @page.user = current_user_or_guest
     respond_to do |format|
       if @page.save
         format.js
@@ -237,10 +237,10 @@ class PagesController < ApplicationController
     end
     @component.create_default_choices if component_class == Embeddable::MultipleChoice
     @component.pages << @page
-    @component.user = current_user
+    @component.user = current_user_or_guest
     @component.save
     @element = @page.element_for(@component)
-    @element.user = current_user
+    @element.user = current_user_or_guest
     @element.save
     
     # 
@@ -294,7 +294,7 @@ class PagesController < ApplicationController
   # Paste a page component
   #
   def paste
-    if @page.changeable?(current_user)
+    if @page.changeable?(current_user_or_guest)
       @original = clipboard_object(params)      
       if (@original) 
         # let some embeddables define their own means to save

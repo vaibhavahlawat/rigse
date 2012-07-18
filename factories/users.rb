@@ -23,6 +23,9 @@ Factory.define :user do |f|
   f.skip_notifications true
   f.require_password_reset false
   f.roles  { [ Factory.next(:member_role)] }
+  f.confirmed_at '5/5/2009'
+  # f.confirmation_sent_at '8/8/2012'
+  # f.confirmation_token '23456'
   f.vendor_interface { |d| Probe::VendorInterface.find(:first) || Factory(:probe_vendor_interface) }
 end
 
@@ -41,8 +44,8 @@ Factory.sequence :admin_user do |n|
       :site_admin => 1,
       :roles => [Factory.next(:member_role),Factory.next(:admin_role)]
     })
-    admin.register
-    admin.activate
+    admin.confirm!
+    # admin.activate
     admin.save!
   end
   admin
@@ -62,8 +65,9 @@ Factory.sequence :researcher_user do |n|
       :site_admin => 0,
       :roles => [Factory.next(:member_role),Factory.next(:researcher_role)]
     })
-    researcher.register
-    researcher.activate
+    # researcher.register
+    # researcher.activate
+    researcher.confirm!
     researcher.save!
   end
   researcher
@@ -83,8 +87,9 @@ Factory.sequence :anonymous_user do |n|
         :first_name => 'anonymous',
         :roles => [Factory.next(:guest_role)]
       })
-      anon.register
-      anon.activate
+      # anon.register
+      # anon.activate
+      anon.confirm!
       # clear any previous Anonymous user still cached as a class variable in the User class
       User.anonymous(true)
       anon.save!

@@ -1,7 +1,14 @@
-require 'digest/sha1'
-
 class User < ActiveRecord::Base
+  # Include default devise modules. Others available are:
+  # :token_authenticatable, :confirmable,
+  # :lockable, :timeoutable and :omniauthable
+  devise :database_authenticatable, :registerable,
+         :recoverable, :rememberable, :trackable, :validatable, :confirmable
+
   NO_EMAIL_STRING='no-email-'
+  # Setup accessible (or protected) attributes for your model
+  attr_accessible :login,:email, :password, :password_confirmation, :remember_me
+  # attr_accessible :title, :body
   has_many :investigations
   has_many :resource_pages
   has_many :activities
@@ -18,7 +25,7 @@ class User < ActiveRecord::Base
   has_many :drawing_tools, :class_name => 'Embeddable::DrawingTool'
   has_many :mw_modeler_pages, :class_name => 'Embeddable::MwModelerPage'
   has_many :n_logo_models, :class_name => 'Embeddable::NLogoModel'
-
+ 
   scope :active, { :conditions => { :state => 'active' } }
   scope :no_email, { :conditions => "email LIKE '#{NO_EMAIL_STRING}%'" }
   scope :email, { :conditions => "email NOT LIKE '#{NO_EMAIL_STRING}%'" }
@@ -28,75 +35,31 @@ class User < ActiveRecord::Base
   }
   has_settings
 
-  # has_many :assessment_targets, :class_name => 'RiGse::AssessmentTarget'
-  # has_many :big_ideas, :class_name => 'RiGse::BigIdea'
-  # has_many :domains, :class_name => 'RiGse::Domain'
-  # has_many :expectations, :class_name => 'RiGse::Expectation'
-  # has_many :expectation_stems, :class_name => 'RiGse::ExpectationStem'
-  # has_many :grade_span_expectations, :class_name => 'RiGse::GradeSpanExpectation'
-  # has_many :knowledge_statements, :class_name => 'RiGse::KnowledgeStatement'
-  # has_many :unifying_themes, :class_name => 'RiGse::UnifyingTheme'
-
-  include Changeable
-
-  include Authentication
-  include Authentication::ByPassword
-  include Authentication::ByCookieToken
-  include Authorization::AasmRoles
-
-  attr_accessor :skip_notifications
-
-  before_validation :strip_spaces
-
-  # strip leading and trailing spaces from names, login and email
-  def strip_spaces
-    # these are conditionalized because it is called before the validation
-    # so the validation will make sure they are setup correctly
-    self.first_name? && self.first_name.strip!
-    self.last_name? && self.last_name.strip!
-    self.login? && self.login.strip!
-    self.email? && self.email.strip!
-    self
-  end
-
-  # Validations
-
-  validates_presence_of     :login
-  validates_length_of       :login,    :within => 1..40
-  validates_uniqueness_of   :login
-  validates_format_of       :login,    :with => Authentication.login_regex, :message => Authentication.bad_login_message
-
-  validates_format_of       :first_name,     :with => Authentication.name_regex,  :message => Authentication.bad_name_message, :allow_nil => true
-  validates_length_of       :first_name,     :maximum => 100
-
-  validates_format_of       :last_name,     :with => Authentication.name_regex,  :message => Authentication.bad_name_message, :allow_nil => true
-  validates_length_of       :last_name,     :maximum => 100
-
-  validates_presence_of     :email
-  validates_length_of       :email,    :within => 6..100 #r@a.wk
-  validates_uniqueness_of   :email
-  validates_format_of       :email,    :with => Authentication.email_regex, :message => Authentication.bad_email_message
-
+  #load it later
+  @@anonymous_user = nil
   validates_presence_of     :vendor_interface_id
-  validates_presence_of     :password, :on => :update, :if => :updating_password?
 
-  # Relationships
   has_and_belongs_to_many :roles, :uniq => true, :join_table => "roles_users"
+  
+  # has_many :resource_pages
 
   has_one :portal_teacher, :class_name => "Portal::Teacher"
   has_one :portal_student, :class_name => "Portal::Student"
 
   belongs_to :vendor_interface, :class_name => 'Probe::VendorInterface'
+  
+  scope :default, { :conditions => { :default_user => true } }
+  attr_accessor :skip_notifications
 
   attr_accessor :updating_password
 
   acts_as_replicatable
 
   self.extend SearchableModel
-
   @@searchable_attributes = %w{login first_name last_name email}
 
-  class <<self
+    
+   class <<self
     def searchable_attributes
       @@searchable_attributes
     end
@@ -107,17 +70,6 @@ class User < ActiveRecord::Base
 
     def login_does_not_exist?(login)
       User.count(:conditions => "`login` = '#{login}'") == 0
-    end
-
-    def suggest_login(first,last)
-      base = "#{first.first}#{last}".downcase.gsub(/[^a-z]/, "_")
-      suggestion = base
-      count = 0
-      while(login_exists?(suggestion)) 
-        count = count + 1
-        suggestion = "#{base}#{count}"
-      end
-      return suggestion
     end
 
     def default_users
@@ -147,26 +99,14 @@ class User < ActiveRecord::Base
   def has_investigations?
     investigations.length > 0
   end
-
-  # we will lazy load the anonymous user later
-  @@anonymous_user = nil
-
-  # default users are a class of users that can be enable
+# default users are a class of users that can be enable
   default_value_for :default_user, false
 
   # we need a default Probe::VendorInterface, 6 = Vernier Go! IO
   default_value_for :vendor_interface_id, 14
 
-  # HACK HACK HACK -- how to do attr_accessible from here?
-  # prevents a user from submitting a crafted form that bypasses activation
-  # anything else you want your user to change should be added here.
-  attr_accessible :login, :email, :first_name, :last_name, :password, :password_confirmation, :vendor_interface_id, :external_id
-
-  # Authenticates a user by their login name and unencrypted password.  Returns the user or nil.
-  def self.authenticate(login, password)
-    u1 = find_in_state :first, :active, :conditions => { :login => login } # need to get the salt
-    u1 && u1.authenticated?(password) ? u1 : nil
-  end
+  attr_accessible :first_name, :last_name, :vendor_interface_id, :external_id
+ 
 
   def name
     _fullname = "#{first_name} #{last_name}".strip
@@ -178,28 +118,16 @@ class User < ActiveRecord::Base
     _fullname.empty? ? login : "#{_fullname} ( #{login} )"
   end
 
-  # Check if a user has a role.
-  #
-  # Returns True if User has one of the roles.
-  # False otherwize.
-  #
-  # You can pass in a sequence of strings:
-  #
-  #  user.has_role?("admin", "manager")
-  #
-  # or an array of strings:
-  #
-  #  user.has_role?(%w{admin manager})
-  #
+
+
+
   def has_role?(*role_list)
     roles.reload # will always hit the database?
     (roles.map{ |r| r.title.downcase } & role_list.flatten).length > 0
   end
-
   def does_not_have_role?(*role_list)
     !has_role?(role_list)
   end
-
   def add_role(role)
     unless has_role?(role)
       roles << Role.find_or_create_by_title(role)
@@ -223,26 +151,24 @@ class User < ActiveRecord::Base
     end
   end
 
-  def make_user_a_member
-    self.add_role('member')
+
+  #This funtion overrides the function of devise to allow sign-in using login instead of email.
+  def self.find_first_by_auth_conditions(warden_conditions)
+      conditions = warden_conditions.dup
+      if login = conditions.delete(:login)
+        where(conditions).where(["lower(login) = :value OR lower(email) = :value", { :value => login.downcase }]).first
+      else
+        where(conditions).first
+      end
   end
 
-  # is this user the anonymous user?
+
+    
+   #anonymous user is created if the user is not currently logged in.
   def anonymous?
     self == User.anonymous
   end
 
-  # Class method for returning the memoized anonymous user
-  #
-  # If you have deleted and recreated the Anonymous user
-  # then call User.anonymous(true) once to reload the memoized
-  # object. If you don't then calling User.anonymous will return
-  # the older deleted Anonymous user.
-  #
-  # If the anonymous user can't be found it is created.
-  #
-  # FIXME: using class variables like this is not thread-safe
-  #
   def self.anonymous(reload=false)
     @@anonymous_user = nil if reload
     if @@anonymous_user
@@ -250,17 +176,18 @@ class User < ActiveRecord::Base
     else
       anonymous_user = User.find_or_create_by_login(
         :login                 => "anonymous",
-        :first_name            => "Anonymous",
-        :last_name             => "User",
+        #:first_name            => "Anonymous",
+        #:last_name             => "User",
         :email                 => "anonymous@concord.org",
         :password              => "password",
-        :password_confirmation => "password"){|u| u.skip_notifications = true}
+        :password_confirmation => "password")
+      
       anonymous_user.add_role('guest')
       @@anonymous_user = anonymous_user
     end
   end
 
-  # a bit of a silly method to help the code in lib/changeable.rb so
+# a bit of a silly method to help the code in lib/changeable.rb so
   # it doesn't have to special-case findingthe owner of a user object
   def user
     self
@@ -307,13 +234,61 @@ class User < ActiveRecord::Base
     end
   end
 
-  def updating_password?
-    updating_password
+  def changeable?(user)
+    # the Anonymous user can't change anything, always return false
+    if(user.anonymous?)
+      return false
+
+    # admin and manager users can change everything the system delivers to them
+    elsif user.has_role?("admin", "manager")
+      true
+
+    # Some things (eg: portal_clazes) might havemultiple owners (users)
+    # So provide alternate "is_user?" pattern for those cases.
+    # is_user? should take precedence, because "user" is more ambiguous
+    # in the case of models with multiple owners
+    elsif self.respond_to?(:is_user?)
+      if self.is_user?(user)
+        true
+      else
+        false
+      end
+
+    # is this object a User object?
+    # if so a normal User can only change their own User object
+    elsif self.respond_to?(:user)
+      if self.user == user
+        true
+      else
+        false
+      end
+
+    # if this object is owned and the user is the owner return true
+    elsif owned?
+      self.user == user
+
+    # else return false
+    else
+      false
+    end
   end
 
-  protected
-  def make_activation_code
-    self.deleted_at = nil
-    self.activation_code = self.class.make_token
+  def owned?
+    if self.respond_to? :user
+      if self.user.nil?
+        return false
+      end
+      if self.user.anonymous?
+        return false
+      end
+      true
+    else
+      false
+    end
   end
+
+  def un_owned?
+    return (! self.owned?)
+  end
+  #-------
 end

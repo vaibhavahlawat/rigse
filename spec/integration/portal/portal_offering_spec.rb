@@ -5,8 +5,9 @@ describe "Portal::Offering" do
     generate_default_project_and_jnlps_with_factories
     learner = Factory(:full_portal_learner)
     user = learner.student.user
-    user.register
-    user.activate
+    # user.register
+    # user.activate
+    user.confirm!
     user.save!
     
     # log in as this learner

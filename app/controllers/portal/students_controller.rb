@@ -1,5 +1,7 @@
 class Portal::StudentsController < ApplicationController
 
+  skip_before_filter :authenticate_user!, :only=>[:new, :create, :signup]
+  # before_filter :authenticate_user!, :except => [:new, :create]
   include RestrictedPortalController
   public
 
@@ -94,10 +96,10 @@ class Portal::StudentsController < ApplicationController
     if @user.valid? && errors.length < 1
       # temporarily disable sending email notifications for state change events
       @user.skip_notifications = true
-      @user.register!
+      @user.confirm!
       user_created = @user.save
       if user_created
-        @user.activate!
+        @user.confirm!
         if current_project.allow_default_class || @grade_level.nil?
           @portal_student = Portal::Student.create(:user_id => @user.id)
         else
@@ -115,6 +117,7 @@ class Portal::StudentsController < ApplicationController
 
           format.html { render 'signup_success' }
         else
+          logout(user)
           msg = <<-EOF
             You have successfully registered #{@user.name} with the username <span class="big">#{@user.login}</span>.
             <br/>
@@ -216,7 +219,7 @@ class Portal::StudentsController < ApplicationController
     if request.post?
       @portal_clazz = find_clazz_from_params
       class_word = params[:clazz][:class_word]
-      if @portal_clazz && class_word && ! current_user.anonymous?
+      if @portal_clazz && class_word && ! current_user_or_guest.anonymous?
         @student = current_user.portal_student
         if ! @student
           @grade_level = find_grade_level_from_params
@@ -224,7 +227,7 @@ class Portal::StudentsController < ApplicationController
         end
         @student.process_class_word(class_word)
       else
-        if current_user.anonymous?
+        if current_user_or_guest.anonymous?
           flash[:error] = "You must be logged in to sign up for a class!"
         else
           flash[:error] = "The class word you provided was not valid! Please check with your teacher to ensure you have the correct word."

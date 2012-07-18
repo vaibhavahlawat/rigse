@@ -28,7 +28,7 @@ Feature: Student joins default class
     Then I should see "Your username is: estudent"
     And I should not see "Sorry, there was an error creating your account"
     When I login with username: estudent password: password
-    And I should see "Logged in successfully"
+    And I should see "Signed in successfully"
 
   @javascript
   Scenario: Student in default class joins another class

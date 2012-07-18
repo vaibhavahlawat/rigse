@@ -2,6 +2,7 @@ Feature: External Activities can be run as offerings
 
   As a student
   I want to run an External Activity that has been assigned to me
+  
 
   Background:
     Given The default project and jnlp resources exist using factories
@@ -17,7 +18,7 @@ Feature: External Activities can be run as offerings
     And the following students exist:
       | login   | password |
       | student | student  |
-
+  
   @javascript
   Scenario: External Activity offerings are runnable
     Given the student "student" belongs to class "My Class"
