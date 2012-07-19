@@ -26,6 +26,27 @@ class User < ActiveRecord::Base
   has_many :investigations
   
   scope :default, { :conditions => { :default_user => true } }
+  attr_accessor :skip_notifications
+
+   class <<self
+    
+    def default_users
+      User.find(:all, :conditions => { :default_user => true })
+    end
+
+    def suspend_default_users
+      default_users.each { |user| user.suspend! if user.state == 'active' }
+    end
+
+    def unsuspend_default_users
+      default_users.each { |user| user.unsuspend! if user.state == 'suspended' }
+    end
+
+    # return the user who is the site administrator
+    def site_admin
+      User.find_by_email(APP_CONFIG[:default_admin_user][:email])
+    end
+  end
 
 
   def has_role?(*role_list)

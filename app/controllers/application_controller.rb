@@ -5,6 +5,7 @@ require 'will_paginate/array'
 class ApplicationController < ActionController::Base
   include Clipboard
 
+  before_filter :authenticate_user!
   #for devise
   helper_method :current_user_or_guest
   skip_before_filter :verify_authenticity_token, :only => [:name_of_your_action]

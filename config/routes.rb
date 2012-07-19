@@ -1,5 +1,5 @@
 RailsPortal::Application.routes.draw do
-  devise_for :users
+  devise_for :users, :path_names => {:sign_in => "login"}
 
 constraints :id => /\d+/ do
   namespace :saveable do
@@ -489,7 +489,7 @@ constraints :id => /\d+/ do
   resources :images
 
   if Rails.env.cucumber? || Rails.env.test?
-    match '/login/:username' => 'sessions#backdoor', :as => :login_backdoor
+    match '/login/:username' => 'home#backdoor', :as => :login_backdoor
   end
 
   match '/missing_installer/:os' => 'home#missing_installer', :as => :installer, :os => 'osx'
