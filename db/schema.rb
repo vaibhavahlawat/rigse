@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120719180410) do
+ActiveRecord::Schema.define(:version => 20120719183522) do
 
   create_table "activities", :force => true do |t|
     t.integer  "user_id"
@@ -2194,6 +2194,8 @@ ActiveRecord::Schema.define(:version => 20120719180410) do
     t.string   "first_name",             :limit => 100, :default => ""
     t.string   "last_name",              :limit => 100, :default => ""
     t.boolean  "require_password_reset",                :default => false
+    t.integer  "vendor_interface_id"
+    t.boolean  "site_admin",                            :default => false
   end
 
   add_index "users", ["email"], :name => "index_users_on_email", :unique => true

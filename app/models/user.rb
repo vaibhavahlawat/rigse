@@ -16,6 +16,7 @@ class User < ActiveRecord::Base
 
   #load it later
   @@anonymous_user = nil
+  validates_presence_of     :vendor_interface_id
 
   has_and_belongs_to_many :roles, :uniq => true, :join_table => "roles_users"
   
@@ -24,6 +25,8 @@ class User < ActiveRecord::Base
   has_one :portal_teacher, :class_name => "Portal::Teacher"
   has_one :portal_student, :class_name => "Portal::Student"
   has_many :investigations
+
+  belongs_to :vendor_interface, :class_name => 'Probe::VendorInterface'
   
   scope :default, { :conditions => { :default_user => true } }
   attr_accessor :skip_notifications
@@ -47,8 +50,13 @@ class User < ActiveRecord::Base
       User.find_by_email(APP_CONFIG[:default_admin_user][:email])
     end
   end
+# default users are a class of users that can be enable
+  default_value_for :default_user, false
 
+  # we need a default Probe::VendorInterface, 6 = Vernier Go! IO
+  default_value_for :vendor_interface_id, 14
 
+  attr_accessible :first_name, :last_name, :vendor_interface_id
   def has_role?(*role_list)
     roles.reload # will always hit the database?
     (roles.map{ |r| r.title.downcase } & role_list.flatten).length > 0
