@@ -41,8 +41,8 @@ Factory.sequence :admin_user do |n|
       :site_admin => 1,
       :roles => [Factory.next(:member_role),Factory.next(:admin_role)]
     })
-    admin.register
-    admin.activate
+    # admin.confirm!
+    # admin.activate
     admin.save!
   end
   admin
