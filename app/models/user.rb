@@ -122,4 +122,21 @@ class User < ActiveRecord::Base
       @@anonymous_user = anonymous_user
     end
   end
+
+  def school
+    school_person = self.portal_teacher || self.portal_student
+    if (school_person)
+      return school_person.school
+    end
+  end
+
+  def extra_params
+    if self.school
+      params = school.settings_hash
+    end
+    if params
+      return params.merge(self.settings_hash)
+    end
+    return self.settings_hash
+  end
 end
