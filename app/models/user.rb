@@ -57,6 +57,21 @@ class User < ActiveRecord::Base
   default_value_for :vendor_interface_id, 14
 
   attr_accessible :first_name, :last_name, :vendor_interface_id
+ 
+
+  def name
+    _fullname = "#{first_name} #{last_name}".strip
+    _fullname.empty? ? login : _fullname
+  end
+
+  def name_and_login
+    _fullname = "#{last_name}, #{first_name}".strip
+    _fullname.empty? ? login : "#{_fullname} ( #{login} )"
+  end
+
+
+
+
   def has_role?(*role_list)
     roles.reload # will always hit the database?
     (roles.map{ |r| r.title.downcase } & role_list.flatten).length > 0
