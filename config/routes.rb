@@ -1,5 +1,11 @@
 RailsPortal::Application.routes.draw do
   devise_for :users, :path_names => {:sign_in => "login"}
+  devise_scope :user do
+   # get "register", :to => "devise/registrations#new"
+   get "login", :to => "devise/sessions#new"
+   get "logout", :to => "devise/sessions#destroy"
+  end
+
 
 constraints :id => /\d+/ do
   namespace :saveable do
