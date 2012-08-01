@@ -57,8 +57,7 @@ class ApplicationController < ActionController::Base
   # before_filter :check_for_password_reset_requirement
   # before_filter :check_student_security_questions_ok
 
-  # Portal::School.find(:first).members.count
-
+  
   protected
 
 
