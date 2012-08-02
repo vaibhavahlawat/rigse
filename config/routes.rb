@@ -515,6 +515,7 @@ constraints :id => /\d+/ do
   match '/:controller(/:action(/:id))'
 
   root :to => 'home#index'
+  
 
 end
 end
