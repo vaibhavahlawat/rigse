@@ -8,6 +8,23 @@ class User < ActiveRecord::Base
   # Setup accessible (or protected) attributes for your model
   attr_accessible :login,:email, :password, :password_confirmation, :remember_me
   # attr_accessible :title, :body
+  has_many :investigations
+  has_many :resource_pages
+  has_many :activities
+  has_many :sections
+  has_many :pages
+  has_many :external_activities
+  # has_many :security_questions
+
+  has_many :data_collectors, :class_name => 'Embeddable::DataCollector'
+  has_many :xhtmls, :class_name => 'Embeddable::Xhtml'
+  has_many :open_responses, :class_name => 'Embeddable::OpenResponse'
+  has_many :multiple_choices, :class_name => 'Embeddable::MultipleChoice'
+  has_many :data_tables, :class_name => 'Embeddable::DataTable'
+  has_many :drawing_tools, :class_name => 'Embeddable::DrawingTool'
+  has_many :mw_modeler_pages, :class_name => 'Embeddable::MwModelerPage'
+  has_many :n_logo_models, :class_name => 'Embeddable::NLogoModel'
+
 
   scope :with_role, lambda { | role_name |
     { :include => :roles, :conditions => ['roles.title = ?',role_name]}
@@ -20,7 +37,7 @@ class User < ActiveRecord::Base
 
   has_and_belongs_to_many :roles, :uniq => true, :join_table => "roles_users"
   
-  has_many :resource_pages
+  # has_many :resource_pages
 
   has_one :portal_teacher, :class_name => "Portal::Teacher"
   has_one :portal_student, :class_name => "Portal::Student"
