@@ -25,4 +25,5 @@ Feature: External Activities can be run as offerings
     And I am logged in with the username student
     When I go to my home page
     And follow "My Activity"
+    And I debug
     Then I should be on /home

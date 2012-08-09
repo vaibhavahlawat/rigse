@@ -5,6 +5,7 @@ class User < ActiveRecord::Base
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :trackable, :validatable
 
+  NO_EMAIL_STRING='no-email-'
   # Setup accessible (or protected) attributes for your model
   attr_accessible :login,:email, :password, :password_confirmation, :remember_me
   # attr_accessible :title, :body
@@ -14,7 +15,7 @@ class User < ActiveRecord::Base
   has_many :sections
   has_many :pages
   has_many :external_activities
-  # has_many :security_questions
+  has_many :security_questions
 
   has_many :data_collectors, :class_name => 'Embeddable::DataCollector'
   has_many :xhtmls, :class_name => 'Embeddable::Xhtml'
@@ -24,8 +25,11 @@ class User < ActiveRecord::Base
   has_many :drawing_tools, :class_name => 'Embeddable::DrawingTool'
   has_many :mw_modeler_pages, :class_name => 'Embeddable::MwModelerPage'
   has_many :n_logo_models, :class_name => 'Embeddable::NLogoModel'
-
-
+ 
+  scope :active, { :conditions => { :state => 'active' } }
+  scope :no_email, { :conditions => "email LIKE '#{NO_EMAIL_STRING}%'" }
+  scope :email, { :conditions => "email NOT LIKE '#{NO_EMAIL_STRING}%'" }
+  scope :default, { :conditions => { :default_user => true } }
   scope :with_role, lambda { | role_name |
     { :include => :roles, :conditions => ['roles.title = ?',role_name]}
   }
@@ -41,15 +45,33 @@ class User < ActiveRecord::Base
 
   has_one :portal_teacher, :class_name => "Portal::Teacher"
   has_one :portal_student, :class_name => "Portal::Student"
-  has_many :investigations
 
   belongs_to :vendor_interface, :class_name => 'Probe::VendorInterface'
   
   scope :default, { :conditions => { :default_user => true } }
   attr_accessor :skip_notifications
 
-   class <<self
+  attr_accessor :updating_password
+
+  acts_as_replicatable
+
+  self.extend SearchableModel
+  @@searchable_attributes = %w{login first_name last_name email}
+
     
+   class <<self
+    def searchable_attributes
+      @@searchable_attributes
+    end
+
+    def login_exists?(login)
+      User.count(:conditions => "`login` = '#{login}'") >= 1
+    end
+
+    def login_does_not_exist?(login)
+      User.count(:conditions => "`login` = '#{login}'") == 0
+    end
+
     def default_users
       User.find(:all, :conditions => { :default_user => true })
     end
@@ -67,13 +89,23 @@ class User < ActiveRecord::Base
       User.find_by_email(APP_CONFIG[:default_admin_user][:email])
     end
   end
+
+  def removed_investigation
+    unless self.has_investigations?
+      self.remove_role('author')
+    end
+  end
+
+  def has_investigations?
+    investigations.length > 0
+  end
 # default users are a class of users that can be enable
   default_value_for :default_user, false
 
   # we need a default Probe::VendorInterface, 6 = Vernier Go! IO
   default_value_for :vendor_interface_id, 14
 
-  attr_accessible :first_name, :last_name, :vendor_interface_id
+  attr_accessible :first_name, :last_name, :vendor_interface_id, :external_id
  
 
   def name
@@ -155,6 +187,24 @@ class User < ActiveRecord::Base
     end
   end
 
+# a bit of a silly method to help the code in lib/changeable.rb so
+  # it doesn't have to special-case findingthe owner of a user object
+  def user
+    self
+  end
+
+  # If this user is a student, allow the student's teacher(s) to make
+  # changes to this.
+  def is_user?(user)
+    if user == self
+      true
+    elsif user.portal_teacher && self.portal_student && self.portal_student.has_teacher?(user.portal_teacher)
+      true
+    else
+      false
+    end
+  end
+
   def school
     school_person = self.portal_teacher || self.portal_student
     if (school_person)
@@ -170,6 +220,18 @@ class User < ActiveRecord::Base
       return params.merge(self.settings_hash)
     end
     return self.settings_hash
+  end
+
+  # This method gets a bang because it saves the new questions. -- Cantina-CMH 6/17/10
+  def update_security_questions!(new_questions)
+    return unless new_questions.is_a?(Array)
+
+    self.security_questions.destroy_all
+
+    new_questions.each do |q|
+      self.security_questions << q
+      q.save
+    end
   end
 
   def changeable?(user)
