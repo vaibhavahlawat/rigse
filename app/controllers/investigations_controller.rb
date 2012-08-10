@@ -8,7 +8,10 @@ class InvestigationsController < AuthoringController
 
   include RestrictedController
   #access_rule 'researcher', :only => [:usage_report, :details_report]
-
+  
+  #to skip devise
+  skip_before_filter :authenticate_user!
+  
   before_filter :setup_object, :except => [:index,:list_filter,:preview_index]
   before_filter :render_scope, :only => [:show]
   # editing / modifying / deleting require editable-ness

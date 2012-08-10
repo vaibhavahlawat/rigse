@@ -53,7 +53,7 @@ class ApplicationController < ActionController::Base
 
   # before_filter :check_user
   # before_filter :original_user
-  # before_filter :portal_resources
+    before_filter :portal_resources
   # before_filter :check_for_password_reset_requirement
   # before_filter :check_student_security_questions_ok
 

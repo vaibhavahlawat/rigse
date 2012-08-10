@@ -62,8 +62,8 @@ Factory.sequence :researcher_user do |n|
       :site_admin => 0,
       :roles => [Factory.next(:member_role),Factory.next(:researcher_role)]
     })
-    researcher.register
-    researcher.activate
+    # researcher.register
+    # researcher.activate
     researcher.save!
   end
   researcher
@@ -83,8 +83,8 @@ Factory.sequence :anonymous_user do |n|
         :first_name => 'anonymous',
         :roles => [Factory.next(:guest_role)]
       })
-      anon.register
-      anon.activate
+      # anon.register
+      # anon.activate
       # clear any previous Anonymous user still cached as a class variable in the User class
       User.anonymous(true)
       anon.save!
