@@ -166,6 +166,7 @@ First creating admin user account for: #{APP_CONFIG[:admin_email]} from site par
         unless user.state == 'active'
           # user.register!
           # user.activate!
+          user.confirm!
         end
         user.roles.clear
       end
@@ -376,6 +377,7 @@ First creating admin user account for: #{APP_CONFIG[:admin_email]} from site par
         user.save
         # user.register!
         # user.activate!
+        user.confirm!
       end
       admin_user.roles << admin_role 
       researcher_user.roles << researcher_role

@@ -7,6 +7,7 @@ Given /^the following students exist:$/ do |table|
       user.add_role("member")
       #user.register
       #user.activate
+      user.confirm!
       user.save!
 
       portal_student = Factory(:full_portal_student, { :user => user })

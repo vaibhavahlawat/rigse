@@ -211,6 +211,7 @@ Given /^the following researchers exist:$/ do |users_table|
       user.add_role("researcher")
       # user.register
       # user.activate
+      user.confirm!
       user.save!
     rescue ActiveRecord::RecordInvalid
       # assume this user is already created...
