@@ -4,6 +4,7 @@ RailsPortal::Application.routes.draw do
    post "signup", :to => "devise/registrations#new"
    get "login", :to => "devise/sessions#new"
    get "logout", :to => "devise/sessions#destroy"
+   get "signup" , :to => "devise/registrations#new"
   end
 
 
@@ -214,7 +215,7 @@ constraints :id => /\d+/ do
   # match '/logout' => 'sessions#destroy', :as => :logout
   # match '/login' => 'sessions#new', :as => :login
   # match '/register' => 'users#create', :as => :register
-  # match '/signup' => 'users#new', :as => :signup
+  match '/signup' => 'devise/registrations#new', :as => :signup
   # match '/activate/:activation_code' => 'users#activate', :as => :activate, :activation_code => nil
   # match '/forgot_password' => 'passwords#login', :as => :forgot_password
   # match '/forgot_password/email' => 'passwords#email', :as => :forgot_password_email

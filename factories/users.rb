@@ -24,6 +24,8 @@ Factory.define :user do |f|
   f.require_password_reset false
   f.roles  { [ Factory.next(:member_role)] }
   f.confirmed_at '5/5/2009'
+  # f.confirmation_sent_at '8/8/2012'
+  # f.confirmation_token '23456'
   f.vendor_interface { |d| Probe::VendorInterface.find(:first) || Factory(:probe_vendor_interface) }
 end
 
